@@ -1,0 +1,130 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div id="main">
+    <h1>ajax with axios (recomended)</h1>
+    <h2>this is the response in a table</h2><hr />
+    <div class="row">
+        <div class="col-md-5">
+            
+            <div class="form-group">
+                <label>name</label>
+                <input type="text" v-model="name" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>username</label>
+                <input type="text" v-model="username" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>email</label>
+                <input type="text" v-model="email" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>phone</label>
+                <input type="text" v-model="phone" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>website</label>
+                <input type="text" v-model="website" class="form-control" />
+            </div>
+            <button type="button" v-if="name" v-on:click="add" class="btn btn-primary">Add</button>
+        </div>
+
+        <div class="col-md-7">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>username</th>
+                        <th>email</th>
+                        <th>phone</th>
+                        <th>website</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in list">
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.userName }}</td>
+                        <td>{{ item.email }}</td>
+                        <td>{{ item.phone }}</td>
+                        <td>{{ item.webSite }}</td>
+                        <td><button type="button" class="btn btn-danger" v-on:click="deleteUser(item)">delete</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <br />
+    <h1>this is the actual data in json</h1>
+    <hr />
+    <pre>
+        {{ $data }}
+    </pre>
+
+</div>
+
+    <!--this is vue-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.0/vue.js"></script>
+    <!--thsi is the library for the http request using Vuejs-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.1/axios.min.js"></script>
+
+    <script type="text/javascript">
+        //var urlUsers = 'https://jsonplaceholder.typicode.com/users';
+        var urlUsers = 'api/users';
+
+        new Vue({
+            el: '#main',
+            created:function(){
+                this.getUsers();
+            },
+            data:{
+                list: [],
+                
+                name: '',
+                username: '',
+                email: '',
+                phone: '',
+                website:''
+            },
+            
+            methods:{
+                getUsers:function(){
+                    axios.get(urlUsers).then(response => {
+                        this.list = response.data;
+                    });
+                },
+                deleteUser: function (user) {
+                    axios.delete('api/delete/' + user.id).then(response => { 
+                        var index = this.list.indexOf(user);
+                        this.list.splice(index, 1);
+                    });
+                    
+                },
+                add: function () { 
+                    var user = {
+                        id: this.id,
+                        name: this.name,
+                        username: this.username,
+                        email: this.email,
+                        phone: this.phone,
+                        website: this.website
+                    }
+                    axios.post('api/addUser',user).then(response => { 
+                        this.list.push(response.data);
+                    });
+
+                    
+                    this.name = '';
+                    this.username = '';
+                    this.email = '';
+                    this.phone = '';
+                    this.website = '';
+                }
+            }
+        });
+    </script>
